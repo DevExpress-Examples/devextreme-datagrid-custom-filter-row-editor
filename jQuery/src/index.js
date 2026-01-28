@@ -1,10 +1,20 @@
 $(() => {
+  
+
   $('#gridContainer').dxDataGrid({
     dataSource: customers,
     keyExpr: 'ID',
     showBorders: true,
     filterRow: {
       visible: true,
+    },
+    onOptionChanged(e){
+      if(e.fullName === 'columns[3].selectedFilterOperation' && e.value === null){
+        //Create a global instance?
+        let dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+        dropDownComponent.option('value', null);
+        dropDownComponent.close();
+      }
     },
     onEditorPreparing: (e) => {
       // Customize boolean filter editor via e.editorName
@@ -18,7 +28,6 @@ $(() => {
           }
         };
       }
-
       // Customize category filter editor via DOM injection to e.editorElement
       if (e.parentType === 'filterRow' && e.dataField === 'CategoryId') {
         e.cancel = true;
@@ -51,12 +60,30 @@ $(() => {
   });
 
   function createCustomEditor(dataGridArgs) {
-    return $('<div>').dxDropDownBox({
+    return $('<div id="dropDownFilter">').dxDropDownBox({
       dataSource: categories,
       valueExpr: 'id',
       displayExpr: 'name',
+      buttons: [{
+        location: 'after',
+        name: 'customClear',
+        options: {
+          icon: "remove",
+          onClick(e){
+            let dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+            let treeList = $('#embeddedTreeList').dxTreeList('instance');
+            dropDownComponent.option('value', null);
+            dropDownComponent.close();
+            if(treeList){
+              //Should I make this global, in a function?
+              treeList.clearSelection();
+            }
+            dataGridArgs.setValue(null);
+          }
+        }
+      }],
       contentTemplate: (dropDownArgs) => {
-        return $('<div>').dxTreeList({
+        return $('<div id="embeddedTreeList">').dxTreeList({
           dataSource: categories,
           keyExpr: 'id',
           parentIdExpr: 'parentId',
