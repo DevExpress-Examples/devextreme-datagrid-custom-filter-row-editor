@@ -14,10 +14,9 @@ $(() => {
     onEditorPreparing: (e) => {
       // Customize boolean filter editor via e.editorName
       if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
-        const isActiveFilterValue = e.component.columnOption('IsActive', 'filterValue');
         e.editorName = 'dxCheckBox';
         e.editorOptions = {
-          value: isActiveFilterValue ?? null,
+          value: e.value,
           enableThreeStateBehavior: true,
           onValueChanged(args) {
             e.setValue(args.value ?? null);
@@ -44,7 +43,6 @@ $(() => {
         dataField: 'IsActive',
         caption: 'Active',
         dataType: 'boolean',
-
       },
       {
         dataField: 'CategoryId',
@@ -69,9 +67,8 @@ $(() => {
   }
 
   function createCustomEditor(dataGridArgs) {
-    const initialFilterValue = dataGridArgs.component.columnOption('Category', 'filterValue');
     return $('<div id="dropDownFilter">').dxDropDownBox({
-      value: initialFilterValue ?? null,
+      value: dataGridArgs.value,
       dataSource: categories,
       valueExpr: 'id',
       displayExpr: 'name',
