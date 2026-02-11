@@ -11,3 +11,7 @@ export interface NestedTreeListProps {
   dropDownArgs: DropDownBoxTypes.ContentTemplateData;
   treeListRef: React.RefObject<TreeListRef>;
 }
+
+export type CustomEditorHandle = {
+  clearDropDownSelection: () => void;
+}
