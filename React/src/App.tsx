@@ -9,9 +9,11 @@ import DataGrid, {
 import { type DataGridTypes, type DataGridRef } from 'devextreme-react/data-grid';
 import { customers, categories, type Customer } from './data';
 import CustomEditor from './components/CustomEditor.tsx';
+import type { CustomEditorHandle } from './types/CustomEditor.types';
 
 function App(): JSX.Element {
   const dataGrid = useRef<DataGridRef | null>(null);
+  const customEditorRef = useRef<CustomEditorHandle | null>(null);
   const onEditorPreparing = useCallback((e: DataGridTypes.EditorPreparingEvent) => {
     // Customize boolean filter editor via e.editorName
     if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
@@ -28,10 +30,15 @@ function App(): JSX.Element {
     // Customize category filter editor via component prop
     if (e.parentType === 'filterRow' && e.dataField === 'CategoryId') {
       e.cancel = true;
-      createRoot(e.editorElement).render(<CustomEditor gridEditorEvent={e} />);
+      createRoot(e.editorElement).render(<CustomEditor gridEditorEvent={e} ref={customEditorRef} />);
     }
   }, []);
 
+  const onOptionChanged = useCallback((e: DataGridTypes.OptionChangedEvent) => {
+    if (e.fullName === 'columns[3].filterValue' && e.value === null) {
+      customEditorRef.current?.clearDropDownSelection();
+    }
+  }, []);
   const calculateDisplayValue = useCallback((row: Customer) => categories.find((c) => c.id === row.CategoryId)?.name, []);
 
   return (
@@ -42,6 +49,7 @@ function App(): JSX.Element {
         keyExpr="ID"
         showBorders={true}
         onEditorPreparing={onEditorPreparing}
+        onOptionChanged={onOptionChanged}
       >
         <FilterRow visible={true} />
         <Column dataField="ID" width={80} visible={false} />
