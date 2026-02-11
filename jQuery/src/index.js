@@ -56,14 +56,14 @@ $(() => {
 
 
   function clearDropDownSelection(){
-    let dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
-    let treeList = $('#embeddedTreeList').dxTreeList('instance');
-    dropDownComponent.option('value', null);
-    dropDownComponent.close();
-    if(treeList){
-      treeList.clearSelection();
-      treeList.option('expandedRowKeys', []);
-    }
+    const dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+    const treeList = $('#embeddedTreeList').dxTreeList('instance');
+
+    dropDownComponent?.option('value', null);
+    dropDownComponent?.close();
+
+    treeList?.clearSelection();
+    treeList?.option('expandedRowKeys', []);
   }
 
   function createCustomEditor(dataGridArgs) {
@@ -81,11 +81,11 @@ $(() => {
             clearDropDownSelection();
             dataGridArgs.setValue(null);   
           }
-        }
-      }],
+          }
+        }],
       contentTemplate: (dropDownArgs) => {
         return $('<div id="embeddedTreeList">').dxTreeList({
-          selectedRowKeys: initialFilterValue != null ? [initialFilterValue] : [],
+          selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
           dataSource: categories,
           keyExpr: 'id',
           parentIdExpr: 'parentId',
