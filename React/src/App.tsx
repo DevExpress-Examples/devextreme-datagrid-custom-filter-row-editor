@@ -19,7 +19,7 @@ function App(): JSX.Element {
     if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
       e.editorName = 'dxCheckBox';
       e.editorOptions = {
-        value: null,
+        value: e.value,
         enableThreeStateBehavior: true,
         onValueChanged(args: any) {
           e.setValue(args.value ?? null);
@@ -39,7 +39,10 @@ function App(): JSX.Element {
       customEditorRef.current?.clearDropDownSelection();
     }
   }, []);
-  const calculateDisplayValue = useCallback((row: Customer) => categories.find((c) => c.id === row.CategoryId)?.name, []);
+  const calculateDisplayValue = useCallback(
+    (row: Customer) => categories.find((c) => c.id === row.CategoryId)?.name ?? '',
+    [],
+  );
 
   return (
     <div className="demo-container">
@@ -54,11 +57,12 @@ function App(): JSX.Element {
         <FilterRow visible={true} />
         <Column dataField="ID" width={80} visible={false} />
         <Column dataField="CompanyName" caption="Company Name" />
-        <Column dataField="IsActive" caption="Active" dataType="boolean" />
+        <Column dataField="IsActive" caption="Active" dataType="boolean" filterValue={true} />
         <Column
           dataField="CategoryId"
           caption="Category"
           calculateDisplayValue={calculateDisplayValue}
+          filterValue={1}
         />
       </DataGrid>
     </div>

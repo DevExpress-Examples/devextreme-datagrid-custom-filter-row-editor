@@ -10,8 +10,9 @@ export interface NestedTreeListProps {
   gridEditorEvent: DataGridTypes.EditorPreparingEvent;
   dropDownArgs: DropDownBoxTypes.ContentTemplateData;
   treeListRef: React.RefObject<TreeListRef>;
+  value: number | null;
 }
 
 export type CustomEditorHandle = {
   clearDropDownSelection: () => void;
-}
+};

@@ -2,7 +2,7 @@ import { DropDownBox, Button as DropDownBoxButton } from 'devextreme-react/drop-
 import type { DropDownBoxRef, DropDownBoxTypes } from 'devextreme-react/drop-down-box';
 import type { ButtonTypes } from 'devextreme-react/button';
 import {
-  forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState,
+  forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState, useEffect,
 } from 'react';
 import {
   TreeList,
@@ -13,18 +13,28 @@ import type { TreeListRef, TreeListTypes } from 'devextreme-react/tree-list';
 import { categories } from '../data';
 import type { CustomEditorProps, NestedTreeListProps, CustomEditorHandle } from '../types/CustomEditor.types';
 
-function NestedTreeList({ gridEditorEvent, dropDownArgs, treeListRef }: NestedTreeListProps): JSX.Element {
+function NestedTreeList({
+  gridEditorEvent, dropDownArgs, treeListRef, value,
+}: NestedTreeListProps): JSX.Element {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>(dropDownArgs?.value != null ? [dropDownArgs.value] : []);
+
+  useEffect(() => {
+    setSelectedRowKeys(value != null ? [value] : []);
+  }, [value]);
+
   const onSelectionChanged = useCallback((treeListArgs: TreeListTypes.SelectionChangedEvent) => {
     const selectedId = treeListArgs.currentSelectedRowKeys[0];
     if (!selectedId) return;
+    const dropDownBoxInstance = dropDownArgs?.component;
+    dropDownBoxInstance?.option('value', selectedId);
+    dropDownBoxInstance?.close();
     gridEditorEvent.setValue(selectedId);
-    const dropDownBoxInstance = dropDownArgs.component;
-    dropDownBoxInstance.option('value', selectedId);
-    dropDownBoxInstance.close();
-  }, []);
+    setSelectedRowKeys([selectedId]);
+  }, [dropDownArgs, gridEditorEvent]);
 
   return (
     <TreeList
+      selectedRowKeys={selectedRowKeys}
       ref={treeListRef}
       dataSource={categories}
       keyExpr="id"
@@ -41,14 +51,11 @@ const CustomEditor = forwardRef<CustomEditorHandle, CustomEditorProps>(
   (({ gridEditorEvent }: CustomEditorProps, ref): JSX.Element => {
     const treeListRef = useRef<TreeListRef>(null);
     const dropDownBoxRef = useRef<DropDownBoxRef>(null);
-    const [dropDownBoxValue, setDropDownBoxValue] = useState(gridEditorEvent.value);
+    const [dropDownBoxValue, setDropDownBoxValue] = useState<number | null>(gridEditorEvent.value);
 
     const clearDropDownSelection = useCallback(() => {
       setDropDownBoxValue(null);
       dropDownBoxRef.current?.instance().close();
-      const treeListInstance = treeListRef.current?.instance();
-      treeListInstance?.clearSelection();
-      treeListInstance?.option('expandedRowKeys', []);
     }, []);
 
     useImperativeHandle(ref, () => ({
@@ -56,8 +63,8 @@ const CustomEditor = forwardRef<CustomEditorHandle, CustomEditorProps>(
     }), [clearDropDownSelection]);
 
     const renderTreeList = useCallback(
-      (dropDownArgs: DropDownBoxTypes.ContentTemplateData) => <NestedTreeList gridEditorEvent={gridEditorEvent} dropDownArgs={dropDownArgs} treeListRef={treeListRef} />,
-      [gridEditorEvent],
+      (dropDownArgs: DropDownBoxTypes.ContentTemplateData) => <NestedTreeList gridEditorEvent={gridEditorEvent} dropDownArgs={dropDownArgs} treeListRef={treeListRef} value={dropDownBoxValue} />,
+      [gridEditorEvent, dropDownBoxValue],
     );
 
     const dropDownBoxButtonOptions = useMemo<ButtonTypes.Properties>(
@@ -68,19 +75,17 @@ const CustomEditor = forwardRef<CustomEditorHandle, CustomEditorProps>(
           clearDropDownSelection();
         },
       }),
-      [],
+      [gridEditorEvent, clearDropDownSelection],
     );
 
-    const syncTreeViewSelection = useCallback((e: DropDownBoxTypes.ValueChangedEvent) => {
+    const dropDownBoxValueChanged = useCallback((e: DropDownBoxTypes.ValueChangedEvent) => {
       setDropDownBoxValue(e.value);
-    // configure treelist selection?
-    // https://js.devexpress.com/React/Demos/WidgetsGallery/Demo/DropDownBox/SingleSelection/FluentBlueLight/
     }, []);
 
     return (<DropDownBox
       ref={dropDownBoxRef}
       value={dropDownBoxValue}
-      onValueChanged={syncTreeViewSelection}
+      onValueChanged={dropDownBoxValueChanged}
       dataSource={categories}
       valueExpr="id"
       displayExpr="name"
