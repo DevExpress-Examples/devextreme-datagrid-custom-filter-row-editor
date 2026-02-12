@@ -86,6 +86,7 @@ $(() => {
       contentTemplate: (dropDownArgs) => {
         return $('<div id="embeddedTreeList">').dxTreeList({
           selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
+          height: "100%",
           dataSource: categories,
           keyExpr: 'id',
           parentIdExpr: 'parentId',
