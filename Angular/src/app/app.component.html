@@ -1,3 +1,27 @@
-<div class="default-style">
-  <dx-button [text]="buttonText" (onClick)="onClick($event)"></dx-button>
+<div class="demo-container">
+  <dx-data-grid
+    [dataSource]="customers"
+    keyExpr="ID"
+    [showBorders]="true"
+    (onEditorPreparing)="onEditorPreparing($event)"
+    (onOptionChanged)="onOptionChanged($event)"
+  >
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxi-column dataField="ID" [width]="80" [visible]="false"></dxi-column>
+    <dxi-column dataField="CompanyName" caption="Company Name"></dxi-column>
+    <dxi-column 
+      dataField="IsActive" 
+      caption="Active" 
+      dataType="boolean" 
+      [filterValue]="true"
+    ></dxi-column>
+    <dxi-column
+      dataField="CategoryId"
+      caption="Category"
+      [calculateDisplayValue]="calculateDisplayValue"
+      [filterValue]="1"
+    >
+    </dxi-column>
+  </dx-data-grid>
+
 </div>
