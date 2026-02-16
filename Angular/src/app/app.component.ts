@@ -1,7 +1,14 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewContainerRef,
+  TemplateRef,
+  ViewChild} from '@angular/core';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
-import { customers, categories, Customer } from './data';
-import { CustomEditorComponent } from './custom-editor.component';
+import type { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { customers, categories, Customer, Category } from './data';
+import { one } from "devextreme/events";
+import { DxButtonTypes } from 'devextreme-angular/ui/button';
+import { DxTreeViewComponent } from 'devextreme-angular/ui/tree-view';
+import { DxDropDownBoxTypes } from 'devextreme-angular/ui/drop-down-box';
+import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
 
 @Component({
   selector: 'app-root',
@@ -11,13 +18,48 @@ import { CustomEditorComponent } from './custom-editor.component';
 export class AppComponent {
   @ViewChild(DxDataGridComponent, { static: false }) dataGrid!: DxDataGridComponent;
 
-  customers = customers;
+  @ViewChild("treeViewComponent", { static: false }) treeViewComponent!: DxTreeViewComponent;
 
-  categories = categories;
+  @ViewChild("customFilterRowEditor", { static: true })
+  filterRowEditorRef!: TemplateRef<any>;
 
-  customEditorInstance: CustomEditorComponent | null = null;
+  dropDownBoxValue: number | null = null;
 
-  onEditorPreparing(e: any): void {
+  treeListSelectedRowKeys: [number] | [] = [];
+
+  isDropDownBoxOpened: boolean = false;
+
+  customers!: Customer[];
+  
+  categories!: Category[];
+
+  dropDownBoxButtonOptions: DxButtonTypes.Properties = {
+    icon: 'remove',
+    stylingMode: 'text',
+    onClick: (): void => {
+      //DataGridArgs.setValue(null);
+      //clearDropDownSelection();
+    },
+  }
+
+  constructor(private viewContainerRef: ViewContainerRef) {
+    this.customers = customers;
+    this.categories = categories;
+  }
+  onInitialized(e: DxDropDownBoxTypes.InitializedEvent, value: number | null): void{
+    this.dropDownBoxValue = value;
+  }
+
+  treeListSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent, value: number | null): void {
+    const selectedId = e.currentSelectedRowKeys[0];
+    if (!selectedId) return;
+    this.dropDownBoxValue = selectedId;
+    this.treeListSelectedRowKeys = value != null ? [value] : [];
+    //dataGridArgs.setValue()
+    this.isDropDownBoxOpened = false; 
+  }
+
+  onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
     // Customize boolean filter editor via e.editorName
     if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
       e.editorName = 'dxCheckBox';
@@ -30,15 +72,27 @@ export class AppComponent {
       };
     }
 
-    // Customize category filter editor via component
-    // The custom editor is handled via editCellTemplate in the HTML
+    // Customize category filter editor via appendChild
+    if (e.parentType === 'filterRow' && e.dataField === 'CategoryId') {
+      e.cancel = true;
+      const childView = this.viewContainerRef.createEmbeddedView(
+        this.filterRowEditorRef,
+        { options: e }
+      );
+
+      childView.rootNodes.forEach((element) => {
+        e.editorElement.appendChild(element);
+      });
+
+      one(e.editorElement, "dxremove", () => {
+        childView.destroy();
+      });
+    }
   }
 
   onOptionChanged(e: any): void {
     if (e.fullName === 'columns[3].filterValue' && e.value === null) {
-      if (this.customEditorInstance) {
-        this.customEditorInstance.clearSelection();
-      }
+      //clearDropDownSelection
     }
   }
 
