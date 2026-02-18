@@ -33,12 +33,16 @@ export class AppComponent {
   
   categories!: Category[];
 
+  dataGridArgs: DxDataGridTypes.EditorPreparingEvent | null = null;
+
   dropDownBoxButtonOptions: DxButtonTypes.Properties = {
     icon: 'remove',
     stylingMode: 'text',
     onClick: (): void => {
-      //DataGridArgs.setValue(null);
-      //clearDropDownSelection();
+      if (this.dataGridArgs) {
+        this.dataGridArgs.setValue(null);
+      }
+      this.clearDropDownSelection();
     },
   }
 
@@ -46,20 +50,14 @@ export class AppComponent {
     this.customers = customers;
     this.categories = categories;
   }
-  onInitialized(e: DxDropDownBoxTypes.InitializedEvent, value: number | null): void{
-    this.dropDownBoxValue = value;
-  }
 
-  treeListSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent, value: number | null): void {
-    const selectedId = e.currentSelectedRowKeys[0];
-    if (!selectedId) return;
-    this.dropDownBoxValue = selectedId;
-    this.treeListSelectedRowKeys = value != null ? [value] : [];
-    //dataGridArgs.setValue()
-    this.isDropDownBoxOpened = false; 
+  clearDropDownSelection(): void {
+    this.dropDownBoxValue = null;
+    this.treeListSelectedRowKeys = [];
+    this.isDropDownBoxOpened = false;
   }
-
-  onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
+  
+  gridEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
     // Customize boolean filter editor via e.editorName
     if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
       e.editorName = 'dxCheckBox';
@@ -90,10 +88,24 @@ export class AppComponent {
     }
   }
 
-  onOptionChanged(e: any): void {
+    gridOptionChanged(e: any): void {
     if (e.fullName === 'columns[3].filterValue' && e.value === null) {
-      //clearDropDownSelection
+      this.clearDropDownSelection();
     }
+  }
+
+  dropDownBoxInitialized(e: DxDropDownBoxTypes.InitializedEvent, dataGridArgs: DxDataGridTypes.EditorPreparingEvent): void{
+    this.dropDownBoxValue = dataGridArgs.value;
+    this.dataGridArgs = dataGridArgs;
+  }
+
+  treeListSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent, dataGridArgs: DxDataGridTypes.EditorPreparingEvent): void {
+    const selectedId = e.currentSelectedRowKeys[0];
+    if (!selectedId) return;
+    this.dropDownBoxValue = selectedId;
+    this.treeListSelectedRowKeys = selectedId != null ? [selectedId] : [];
+    dataGridArgs.setValue(selectedId);
+    this.isDropDownBoxOpened = false; 
   }
 
   calculateDisplayValue(row: Customer): string {

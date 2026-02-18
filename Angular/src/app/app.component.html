@@ -3,12 +3,12 @@
     [dataSource]="customers"
     keyExpr="ID"
     [showBorders]="true"
-    (onEditorPreparing)="onEditorPreparing($event)"
-    (onOptionChanged)="onOptionChanged($event)"
+    (onEditorPreparing)="gridEditorPreparing($event)"
+    (onOptionChanged)="gridOptionChanged($event)"
   >
     <dxo-data-grid-filter-row [visible]="true"></dxo-data-grid-filter-row>
-    <dxi-data-grid-column dataField="ID" [width]="80" [visible]="false"></dxi-data-grid-column>
-    <dxi-data-grid-column dataField="CompanyName" caption="Company Name"></dxi-data-grid-column>
+    <dxi-data-grid-column dataType="string" dataField="ID" [width]="80" [visible]="false"></dxi-data-grid-column>
+    <dxi-data-grid-column dataType="string" dataField="CompanyName" caption="Company Name"></dxi-data-grid-column>
     <dxi-data-grid-column
       dataField="IsActive" 
       caption="Active" 
@@ -17,6 +17,7 @@
     ></dxi-data-grid-column>
     <dxi-data-grid-column
       dataField="CategoryId"
+      dataType="number"
       caption="Category"
       [calculateDisplayValue]="calculateDisplayValue"
       [filterValue]="1"
@@ -29,9 +30,10 @@
     <dx-drop-down-box
       [dataSource]="categories"  
       [(value)]="dropDownBoxValue"
-      (onInitialized)="onInitialized($event, options.value)"
+      (onInitialized)="dropDownBoxInitialized($event, options)"
       valueExpr="id"
       displayExpr="name"
+      [(opened)]="isDropDownBoxOpened"
     >
       <dxi-drop-down-box-button  
         location= 'after'
@@ -42,21 +44,19 @@
       <div *dxTemplate="let data of 'content'">
         <dx-tree-list
           #treeViewComponent
-          onContentReady="treeViewContentReady($event, options.value)"
-          [selectedRowKeys]="treeListSelectedRowKeys"
-          (onSelectionChanged)="treeListSelectionChanged($event, options.value)"
+          height="100%"
+          [(selectedRowKeys)]="treeListSelectedRowKeys"
+          (onSelectionChanged)="treeListSelectionChanged($event, options)"
           [dataSource]="categories"
           keyExpr="id"
           parentIdExpr="parentId"
         >
           <dxo-tree-list-selection
-            mode="single">
+            mode="single"> 
           </dxo-tree-list-selection>
           <dxi-tree-list-column dataField="name"></dxi-tree-list-column>
         </dx-tree-list>
       </div>
     </dx-drop-down-box>
   </ng-template>
-
-
 </div>
