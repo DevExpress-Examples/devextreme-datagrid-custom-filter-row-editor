@@ -55,11 +55,12 @@ function App(): JSX.Element {
         onOptionChanged={onOptionChanged}
       >
         <FilterRow visible={true} />
-        <Column dataField="ID" width={80} visible={false} />
-        <Column dataField="CompanyName" caption="Company Name" />
-        <Column dataField="IsActive" caption="Active" dataType="boolean" filterValue={true} />
+        <Column dataField="ID" dataType="number" width={80} visible={false} />
+        <Column dataField="CompanyName" dataType="string" caption="Company Name" />
+        <Column dataField="IsActive" dataType="boolean" caption="Active" filterValue={true} />
         <Column
           dataField="CategoryId"
+          dataType="number"
           caption="Category"
           calculateDisplayValue={calculateDisplayValue}
           filterValue={1}
