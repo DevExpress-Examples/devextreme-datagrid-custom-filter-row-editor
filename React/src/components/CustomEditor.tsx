@@ -34,6 +34,7 @@ function NestedTreeList({
 
   return (
     <TreeList
+      height="100%"
       selectedRowKeys={selectedRowKeys}
       ref={treeListRef}
       dataSource={categories}
