@@ -34,18 +34,21 @@ $(() => {
         dataField: 'ID',
         width: 80,
         visible: false,
+        dataType: 'number',
       },
       {
         dataField: 'CompanyName',
         caption: 'Company Name',
+        dataType: 'string',
       },
       {
         dataField: 'IsActive',
-        caption: 'Active',
         dataType: 'boolean',
+        caption: 'Active',
       },
       {
         dataField: 'CategoryId',
+        dataType: 'number',
         caption: 'Category',
         calculateDisplayValue: (row) => {
           return categories.find(c => c.id === row.CategoryId)?.name;
