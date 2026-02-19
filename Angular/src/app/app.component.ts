@@ -1,14 +1,13 @@
 import { Component, ViewContainerRef,
   TemplateRef,
   ViewChild} from '@angular/core';
-import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import type { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
-import { customers, categories, Customer, Category } from './data';
-import { one } from "devextreme/events";
 import { DxButtonTypes } from 'devextreme-angular/ui/button';
-import { DxTreeViewComponent } from 'devextreme-angular/ui/tree-view';
+import { DxTreeViewComponent } from 'devextreme-angular/';
 import { DxDropDownBoxTypes } from 'devextreme-angular/ui/drop-down-box';
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
+import { customers, categories, Customer, Category } from './data';
+import { one } from "devextreme/events";
 
 @Component({
   selector: 'app-root',
@@ -16,24 +15,21 @@ import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  @ViewChild(DxDataGridComponent, { static: false }) dataGrid!: DxDataGridComponent;
-
   @ViewChild("treeViewComponent", { static: false }) treeViewComponent!: DxTreeViewComponent;
 
-  @ViewChild("customFilterRowEditor", { static: true })
-  filterRowEditorRef!: TemplateRef<any>;
+  @ViewChild("customFilterRowEditor", { static: true }) filterRowEditorRef!: TemplateRef<any>;
+
+  dataGridArgs: DxDataGridTypes.EditorPreparingEvent | null = null;
 
   dropDownBoxValue: number | null = null;
 
-  treeListSelectedRowKeys: [number] | [] = [];
-
   isDropDownBoxOpened: boolean = false;
+
+  treeListSelectedRowKeys: [number] | [] = [];
 
   customers!: Customer[];
   
   categories!: Category[];
-
-  dataGridArgs: DxDataGridTypes.EditorPreparingEvent | null = null;
 
   dropDownBoxButtonOptions: DxButtonTypes.Properties = {
     icon: 'remove',
@@ -88,7 +84,7 @@ export class AppComponent {
     }
   }
 
-    gridOptionChanged(e: any): void {
+  gridOptionChanged(e: DxDataGridTypes.OptionChangedEvent): void {
     if (e.fullName === 'columns[3].filterValue' && e.value === null) {
       this.clearDropDownSelection();
     }
