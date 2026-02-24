@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, createApp } from 'vue';
+import { ref, createVNode, render, nextTick } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import DxDataGrid, {
     DxColumn,
@@ -9,8 +9,7 @@ import type { DxDataGridTypes } from 'devextreme-vue/data-grid';
 import CustomEditor from './CustomEditor.vue';
 import { customers, categories, type Customer } from '../data';
 
-const dataGrid = ref(null);
-const customEditorRef = ref<typeof CustomEditor | null>(null);
+let vnode;
 
 function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent) {
   // Customize boolean filter editor via e.editorName
@@ -28,17 +27,16 @@ function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent) {
   // Customize category filter editor via component prop
   if (e.parentType === 'filterRow' && e.dataField === 'CategoryId') {
     e.cancel = true;
-    const app = createApp(CustomEditor, {
+    vnode = createVNode(CustomEditor, {
       gridEditorEvent: e,
-      ref: customEditorRef,
     });
-    app.mount(e.editorElement);
+    render(vnode, e.editorElement);
   }
 }
 
 function onOptionChanged(e: DxDataGridTypes.OptionChangedEvent) {
   if (e.fullName === 'columns[3].filterValue' && e.value === null) {
-    customEditorRef.value?.clearDropDownSelection?.();
+    vnode.component?.exposed?.clearDropDownSelection();
   }
 }
 
@@ -50,7 +48,6 @@ function calculateDisplayValue(row: Customer) {
 <template>
   <div class="demo-container">
     <DxDataGrid
-      ref="dataGrid"
       :dataSource="customers"
       keyExpr="ID"
       :showBorders="true"

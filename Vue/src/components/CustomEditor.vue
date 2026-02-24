@@ -14,9 +14,7 @@ interface CustomEditorProps {
 }
 
 const props = defineProps<CustomEditorProps>();
-
-const treeListRef = ref(null);
-const dropDownBoxRef = ref(null);
+const dropDownBoxRef = ref<InstanceType<typeof DxDropDownBox> | null>(null);
 const dropDownBoxValue = ref<number | null>(props.gridEditorEvent.value);
 const selectedRowKeys = ref<number[]>(props.gridEditorEvent.value != null ? [props.gridEditorEvent.value] : []);
 
@@ -27,13 +25,12 @@ watch(dropDownBoxValue, (newValue) => {
 function onSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent) {
   const selectedId = e.currentSelectedRowKeys[0];
   if (!selectedId) return;
-  
   const dropDownBoxInstance = dropDownBoxRef.value?.instance;
+  dropDownBoxValue = selectedId;
   dropDownBoxInstance?.option('value', selectedId);
   dropDownBoxInstance?.close();
   props.gridEditorEvent.setValue(selectedId);
   dropDownBoxValue.value = selectedId;
-  selectedRowKeys.value = [selectedId];
 }
 
 function dropDownBoxValueChanged(e: DxDropDownBoxTypes.ValueChangedEvent) {
@@ -70,7 +67,6 @@ defineExpose({
     >
       <template #content>
         <DxTreeList
-          ref="treeListRef"
           height="100%"
           :selectedRowKeys="selectedRowKeys"
           :dataSource="categories"
