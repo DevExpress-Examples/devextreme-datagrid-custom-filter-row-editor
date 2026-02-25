@@ -3,10 +3,10 @@ import { ref, watch } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import DxDropDownBox, { DxButton as DxDropDownBoxButton } from 'devextreme-vue/drop-down-box';
 import type { DxDropDownBoxTypes } from 'devextreme-vue/drop-down-box';
-import type { ButtonTypes } from 'devextreme/ui/button';
 import DxTreeList, { DxColumn as DxTreeListColumn, DxSelection as DxTreeListSelection } from 'devextreme-vue/tree-list';
 import type { DxTreeListTypes } from 'devextreme-vue/tree-list';
 import type { DxDataGridTypes } from 'devextreme-vue/data-grid';
+import type { DxButtonTypes } from 'devextreme/ui/button';
 import { categories } from '../data';
 
 interface CustomEditorProps {
@@ -15,34 +15,34 @@ interface CustomEditorProps {
 
 const props = defineProps<CustomEditorProps>();
 const dropDownBoxRef = ref<InstanceType<typeof DxDropDownBox> | null>(null);
-const dropDownBoxValue = ref<number | null>(props.gridEditorEvent.value);
-const selectedRowKeys = ref<number[]>(props.gridEditorEvent.value != null ? [props.gridEditorEvent.value] : []);
+const dropDownBoxValue = ref<number | null>(props.gridEditorEvent.value as number | null);
+const treeListSelectedRowKeys = ref<number[]>(
+  props.gridEditorEvent.value ? [props.gridEditorEvent.value] : []
+);
 
-watch(dropDownBoxValue, (newValue) => {
-  selectedRowKeys.value = newValue != null ? [newValue] : [];
+watch(dropDownBoxValue, (newValue: number | null) => {
+  treeListSelectedRowKeys.value = newValue != null ? [newValue] : [];
 });
 
-function onSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent) {
-  const selectedId = e.currentSelectedRowKeys[0];
-  if (!selectedId) return;
+function treeListSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent): void {
+  const selectedId: number | undefined = e.currentSelectedRowKeys[0];
+  if (selectedId === undefined) return;
   const dropDownBoxInstance = dropDownBoxRef.value?.instance;
-  dropDownBoxValue = selectedId;
-  dropDownBoxInstance?.option('value', selectedId);
+  dropDownBoxValue.value = selectedId;
   dropDownBoxInstance?.close();
   props.gridEditorEvent.setValue(selectedId);
-  dropDownBoxValue.value = selectedId;
 }
 
-function dropDownBoxValueChanged(e: DxDropDownBoxTypes.ValueChangedEvent) {
-  dropDownBoxValue.value = e.value;
+function dropDownBoxValueChanged(e: DxDropDownBoxTypes.ValueChangedEvent): void {
+  dropDownBoxValue.value = e.value as number | null;
 }
 
-function clearDropDownSelection() {
+function clearDropDownSelection(): void {
   dropDownBoxValue.value = null;
   dropDownBoxRef.value?.instance?.close();
 }
 
-const dropDownBoxButtonOptions: ButtonTypes.Properties = {
+const dropDownBoxButtonOptions: DxButtonTypes.Properties = {
   icon: 'remove',
   onClick: () => {
     props.gridEditorEvent.setValue(null);
@@ -60,22 +60,22 @@ defineExpose({
     <DxDropDownBox
       ref="dropDownBoxRef"
       :value="dropDownBoxValue"
-      @valueChanged="dropDownBoxValueChanged"
-      :dataSource="categories"
-      valueExpr="id"
-      displayExpr="name"
+      @value-changed="dropDownBoxValueChanged"
+      :data-source="categories"
+      value-expr="id"
+      display-expr="name"
     >
       <template #content>
         <DxTreeList
           height="100%"
-          :selectedRowKeys="selectedRowKeys"
-          :dataSource="categories"
-          keyExpr="id"
-          parentIdExpr="parentId"
-          @selectionChanged="onSelectionChanged"
+          :selected-row-keys="treeListSelectedRowKeys"
+          :data-source="categories"
+          key-expr="id"
+          parent-id-expr="parentId"
+          @selection-changed="treeListSelectionChanged"
         >
-          <DxTreeListSelection mode="single" />
-          <DxTreeListColumn dataField="name" />
+          <DxTreeListSelection mode="single"/>
+          <DxTreeListColumn data-field="name"/>
         </DxTreeList>
       </template>
       <DxDropDownBoxButton

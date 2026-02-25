@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import { ref, createVNode, render, nextTick } from 'vue';
+import { createVNode, render, type VNode, type ComponentPublicInstance } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import DxDataGrid, {
-    DxColumn,
-    DxFilterRow
+  DxColumn,
+  DxFilterRow
 } from 'devextreme-vue/data-grid';
 import type { DxDataGridTypes } from 'devextreme-vue/data-grid';
+import type { DxCheckBoxTypes } from 'devextreme-vue/check-box';
 import CustomEditor from './CustomEditor.vue';
 import { customers, categories, type Customer } from '../data';
 
-let vnode;
+interface CustomEditorExposed {
+  clearDropDownSelection: () => void;
+}
 
-function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent) {
+let vnode: VNode | null = null;
+
+function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
   // Customize boolean filter editor via e.editorName
   if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
     e.editorName = 'dxCheckBox';
     e.editorOptions = {
       value: e.value,
       enableThreeStateBehavior: true,
-      onValueChanged(args: any) {
+      onValueChanged(args: DxCheckBoxTypes.ValueChangedEvent): void {
         e.setValue(args.value ?? null);
       },
     };
@@ -27,43 +32,71 @@ function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent) {
   // Customize category filter editor via component prop
   if (e.parentType === 'filterRow' && e.dataField === 'CategoryId') {
     e.cancel = true;
+
+    // Clean up previous vnode if exists
+    if (vnode && e.editorElement) {
+      render(null, e.editorElement);
+    }
+
     vnode = createVNode(CustomEditor, {
       gridEditorEvent: e,
     });
-    render(vnode, e.editorElement);
+
+    if (e.editorElement) {
+      render(vnode, e.editorElement);
+    }
   }
 }
 
-function onOptionChanged(e: DxDataGridTypes.OptionChangedEvent) {
+function onOptionChanged(e: DxDataGridTypes.OptionChangedEvent): void {
   if (e.fullName === 'columns[3].filterValue' && e.value === null) {
-    vnode.component?.exposed?.clearDropDownSelection();
+    const component = vnode?.component as
+      ComponentPublicInstance<{}, CustomEditorExposed> | undefined;
+
+    if (component?.exposed?.clearDropDownSelection) {
+      component.exposed.clearDropDownSelection();
+    }
   }
 }
 
-function calculateDisplayValue(row: Customer) {
+function calculateDisplayValue(row: Customer): string {
   return categories.find((c) => c.id === row.CategoryId)?.name ?? '';
 }
-
 </script>
+
 <template>
   <div class="demo-container">
     <DxDataGrid
-      :dataSource="customers"
-      keyExpr="ID"
-      :showBorders="true"
-      @editorPreparing="onEditorPreparing"
-      @optionChanged="onOptionChanged"
+      :data-source="customers"
+      key-expr="ID"
+      :show-borders="true"
+      @editor-preparing="onEditorPreparing"
+      @option-changed="onOptionChanged"
     >
-      <DxFilterRow :visible="true" />
-      <DxColumn dataField="ID" dataType="number" :width="80" :visible="false" />
-      <DxColumn dataField="CompanyName" dataType="string" caption="Company Name" />
-      <DxColumn dataField="IsActive" dataType="boolean" caption="Active" :filterValue="true" />
+      <DxFilterRow :visible="true"/>
       <DxColumn
-        dataField="CategoryId"
-        dataType="number"
+        data-field="ID"
+        data-type="number"
+        :width="80"
+        :visible="false"
+      />
+      <DxColumn
+        data-field="CompanyName"
+        data-type="string"
+        caption="Company Name"
+      />
+      <DxColumn
+        data-field="IsActive"
+        data-type="boolean"
+        caption="Active"
+        :filter-value="true"
+      />
+      <DxColumn
+        data-field="CategoryId"
+        data-type="number"
         caption="Category"
-        :calculateDisplayValue="calculateDisplayValue"
-        :filterValue="1"
+        :calculate-display-value="calculateDisplayValue"
+        :filter-value="1"
       />
     </DxDataGrid>
   </div>
