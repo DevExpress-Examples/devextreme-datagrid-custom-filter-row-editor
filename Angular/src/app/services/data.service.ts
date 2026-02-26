@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 export interface Customer {
   ID: number;
   CompanyName: string;
@@ -12,7 +14,7 @@ export interface Category {
   name: string;
 }
 
-export const customers: Customer[] = [
+const customers: Customer[] = [
   {
     ID: 1,
     CompanyName: 'Super Mart of the West',
@@ -85,7 +87,7 @@ export const customers: Customer[] = [
   },
 ];
 
-export const categories: Category[] = [
+const categories: Category[] = [
   { id: 1, parentId: 0, name: 'Electronics' },
   { id: 2, parentId: 1, name: 'Laptops' },
   { id: 3, parentId: 1, name: 'Phones' },
@@ -93,3 +95,16 @@ export const categories: Category[] = [
   { id: 5, parentId: 4, name: 'Chairs' },
   { id: 6, parentId: 4, name: 'Tables' },
 ];
+
+@Injectable({
+  providedIn: 'root',
+})
+export class DataService {
+  getCustomers(): Customer[] {
+    return customers;
+  }
+
+  getCategories(): Category[] {
+    return categories;
+  }
+}

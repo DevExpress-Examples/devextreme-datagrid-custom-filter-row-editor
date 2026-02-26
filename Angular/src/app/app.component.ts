@@ -6,7 +6,8 @@ import { DxButtonTypes } from 'devextreme-angular/ui/button';
 import { DxTreeViewComponent } from 'devextreme-angular/';
 import { DxDropDownBoxTypes } from 'devextreme-angular/ui/drop-down-box';
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
-import { customers, categories, Customer, Category } from './data';
+import { DxCheckBoxTypes } from 'devextreme-angular/ui/check-box';
+import { Customer, Category, DataService } from './services/data.service';
 import { one } from "devextreme/events";
 
 @Component({
@@ -17,7 +18,7 @@ import { one } from "devextreme/events";
 export class AppComponent {
   @ViewChild("treeViewComponent", { static: false }) treeViewComponent!: DxTreeViewComponent;
 
-  @ViewChild("customFilterRowEditor", { static: true }) filterRowEditorRef!: TemplateRef<any>;
+  @ViewChild("customFilterRowEditor", { static: true }) filterRowEditorRef!: TemplateRef<{ options: DxDataGridTypes.EditorPreparingEvent }>;
 
   dataGridArgs: DxDataGridTypes.EditorPreparingEvent | null = null;
 
@@ -42,9 +43,9 @@ export class AppComponent {
     },
   }
 
-  constructor(private viewContainerRef: ViewContainerRef) {
-    this.customers = customers;
-    this.categories = categories;
+  constructor(private viewContainerRef: ViewContainerRef, private dataService: DataService) {
+    this.customers = this.dataService.getCustomers();
+    this.categories = this.dataService.getCategories();
   }
 
   clearDropDownSelection(): void {
@@ -60,7 +61,7 @@ export class AppComponent {
       e.editorOptions = {
         value: e.value,
         enableThreeStateBehavior: true,
-        onValueChanged: (args: any) => {
+        onValueChanged: (args: DxCheckBoxTypes.ValueChangedEvent) => {
           e.setValue(args.value ?? null);
         },
       };
@@ -74,7 +75,7 @@ export class AppComponent {
         { options: e }
       );
 
-      childView.rootNodes.forEach((element) => {
+      childView.rootNodes.forEach((element: HTMLElement) => {
         e.editorElement.appendChild(element);
       });
 
@@ -104,7 +105,7 @@ export class AppComponent {
     this.isDropDownBoxOpened = false; 
   }
 
-  calculateDisplayValue(row: Customer): string {
-    return categories.find((c) => c.id === row.CategoryId)?.name ?? '';
+  calculateDisplayValue = (row: Customer): string => {
+    return this.categories.find((c) => c.id === row.CategoryId)?.name ?? '';
   }
 }
