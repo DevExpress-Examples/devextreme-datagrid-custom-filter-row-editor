@@ -7,6 +7,7 @@ import DataGrid, {
   FilterRow,
 } from 'devextreme-react/data-grid';
 import { type DataGridTypes, type DataGridRef } from 'devextreme-react/data-grid';
+import { type CheckBoxTypes } from 'devextreme-react/check-box';
 import { customers, categories, type Customer } from './data';
 import CustomEditor from './components/CustomEditor.tsx';
 import type { CustomEditorHandle } from './types/CustomEditor.types';
@@ -21,7 +22,7 @@ function App(): JSX.Element {
       e.editorOptions = {
         value: e.value,
         enableThreeStateBehavior: true,
-        onValueChanged(args: any) {
+        onValueChanged(args: CheckBoxTypes.ValueChangedEvent) {
           e.setValue(args.value ?? null);
         },
       };
