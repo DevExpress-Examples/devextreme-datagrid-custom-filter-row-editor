@@ -10,10 +10,6 @@ import type { DxCheckBoxTypes } from 'devextreme-vue/check-box';
 import CustomEditor from './CustomEditor.vue';
 import { customers, categories, type Customer } from '../data';
 
-interface CustomEditorExposed {
-  clearDropDownSelection: () => void;
-}
-
 let vnode: VNode | null = null;
 
 function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
