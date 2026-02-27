@@ -6,7 +6,7 @@ import type { DxDropDownBoxTypes } from 'devextreme-vue/drop-down-box';
 import DxTreeList, { DxColumn as DxTreeListColumn, DxSelection as DxTreeListSelection } from 'devextreme-vue/tree-list';
 import type { DxTreeListTypes } from 'devextreme-vue/tree-list';
 import type { DxDataGridTypes } from 'devextreme-vue/data-grid';
-import type { DxButtonTypes } from 'devextreme/ui/button';
+import type { DxButtonTypes } from 'devextreme-vue/button';
 import { categories } from '../data';
 
 interface CustomEditorProps {
