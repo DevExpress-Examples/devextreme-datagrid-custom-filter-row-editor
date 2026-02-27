@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createVNode, render, type VNode, type ComponentPublicInstance } from 'vue';
+import { createVNode, render, type VNode, type ComponentInternalInstance } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import DxDataGrid, {
   DxColumn,
@@ -51,8 +51,7 @@ function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
 function onOptionChanged(e: DxDataGridTypes.OptionChangedEvent): void {
   if (e.fullName === 'columns[3].filterValue' && e.value === null) {
     const component = vnode?.component as
-      ComponentPublicInstance<{}, CustomEditorExposed> | undefined;
-
+    ComponentInternalInstance | undefined;
     if (component?.exposed?.clearDropDownSelection) {
       component.exposed.clearDropDownSelection();
     }
