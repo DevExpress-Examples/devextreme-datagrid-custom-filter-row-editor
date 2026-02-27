@@ -1,3 +1,68 @@
-<div class="default-style">
-  <dx-button [text]="buttonText" (onClick)="onClick($event)"></dx-button>
+<div class="demo-container">
+  <dx-data-grid
+    [dataSource]="customers"
+    keyExpr="ID"
+    [showBorders]="true"
+    (onEditorPreparing)="gridEditorPreparing($event)"
+    (onOptionChanged)="gridOptionChanged($event)"
+  >
+    <dxo-data-grid-filter-row [visible]="true"></dxo-data-grid-filter-row>
+    <dxi-data-grid-column
+      dataType="string"
+      dataField="ID"
+      [width]="80"
+      [visible]="false"
+    ></dxi-data-grid-column>
+    <dxi-data-grid-column
+      dataType="string"
+      dataField="CompanyName"
+      caption="Company Name"
+    ></dxi-data-grid-column>
+    <dxi-data-grid-column
+      dataField="IsActive"
+      caption="Active"
+      dataType="boolean"
+      [filterValue]="true"
+    ></dxi-data-grid-column>
+    <dxi-data-grid-column
+      dataField="CategoryId"
+      dataType="number"
+      caption="Category"
+      [calculateDisplayValue]="calculateDisplayValue"
+      [filterValue]="1"
+    >
+    </dxi-data-grid-column>
+  </dx-data-grid>
+
+  <ng-template #customFilterRowEditor let-options="options">
+    <dx-drop-down-box
+      [(value)]="dropDownBoxValue"
+      [dataSource]="categories"
+      (onInitialized)="dropDownBoxInitialized($event, options)"
+      valueExpr="id"
+      displayExpr="name"
+      [(opened)]="isDropDownBoxOpened"
+    >
+      <dxi-drop-down-box-button
+        location="after"
+        name="customClear"
+        [options]="dropDownBoxButtonOptions"
+      >
+      </dxi-drop-down-box-button>
+      <div *dxTemplate="let data of 'content'">
+        <dx-tree-list
+          #treeViewComponent
+          height="100%"
+          [(selectedRowKeys)]="treeListSelectedRowKeys"
+          [dataSource]="categories"
+          keyExpr="id"
+          parentIdExpr="parentId"
+          (onSelectionChanged)="treeListSelectionChanged($event, options)"
+        >
+          <dxo-tree-list-selection mode="single"> </dxo-tree-list-selection>
+          <dxi-tree-list-column dataField="name"></dxi-tree-list-column>
+        </dx-tree-list>
+      </div>
+    </dx-drop-down-box>
+  </ng-template>
 </div>
