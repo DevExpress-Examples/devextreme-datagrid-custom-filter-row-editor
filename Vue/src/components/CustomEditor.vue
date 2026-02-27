@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import DxDropDownBox, { DxButton as DxDropDownBoxButton } from 'devextreme-vue/drop-down-box';
-import type { DxDropDownBoxTypes } from 'devextreme-vue/drop-down-box';
 import DxTreeList, { DxColumn as DxTreeListColumn, DxSelection as DxTreeListSelection } from 'devextreme-vue/tree-list';
 import type { DxTreeListTypes } from 'devextreme-vue/tree-list';
 import type { DxDataGridTypes } from 'devextreme-vue/data-grid';
@@ -33,10 +32,6 @@ function treeListSelectionChanged(e: DxTreeListTypes.SelectionChangedEvent): voi
   props.gridEditorEvent.setValue(selectedId);
 }
 
-function dropDownBoxValueChanged(e: DxDropDownBoxTypes.ValueChangedEvent): void {
-  dropDownBoxValue.value = e.value as number | null;
-}
-
 function clearDropDownSelection(): void {
   dropDownBoxValue.value = null;
   dropDownBoxRef.value?.instance?.close();
@@ -59,8 +54,7 @@ defineExpose({
   <div>
     <DxDropDownBox
       ref="dropDownBoxRef"
-      :value="dropDownBoxValue"
-      @value-changed="dropDownBoxValueChanged"
+      v-model:value="dropDownBoxValue"
       :data-source="categories"
       value-expr="id"
       display-expr="name"
