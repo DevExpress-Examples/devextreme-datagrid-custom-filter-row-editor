@@ -1,29 +1,139 @@
-@using ASP_NET_Core.Models
+<h2>DataGrid - Custom Filter Row Editor</h2>
 
-<h2>Home</h2>
-
-@(Html.DevExtreme().DataGrid<SampleOrder>()
-    .ShowBorders(true)
-    .DataSource(d => d.Mvc().Controller("SampleData").LoadAction("Get").Key("OrderID"))
-    .Columns(columns => {
-        columns.AddFor(m => m.OrderID);
-        columns.AddFor(m => m.OrderDate);
-        columns.AddFor(m => m.CustomerName);
-        columns.AddFor(m => m.ShipCountry);
-        columns.AddFor(m => m.ShipCity);
-    })
-    .Paging(p => p.PageSize(10))
-    .FilterRow(f => f.Visible(true))
-    .HeaderFilter(f => f.Visible(true))
-    .GroupPanel(p => p.Visible(true))
-    .Grouping(g => g.AutoExpandAll(false))
-    .RemoteOperations(true)
-    .Summary(s => s
-        .TotalItems(totalItems => {
-            totalItems.AddFor(m => m.ShipCity).SummaryType(SummaryType.Count);
-        })
-        .GroupItems(groupItems => {
-            groupItems.Add().SummaryType(SummaryType.Count);
-        })
+@(Html.DevExtreme().DataGrid()
+    .ID("gridContainer")
+    .DataSource(d => d.Mvc()
+        .Controller("SampleData")
+        .LoadAction("Get")
+        .Key("ID")
     )
+    .ShowBorders(true)
+    .FilterRow(f => f.Visible(true))
+    .OnEditorPreparing("onEditorPreparing")
+    .OnOptionChanged("onOptionChanged")
+    .Columns(columns => {
+        columns.Add()
+            .DataField("ID")
+            .Width(80)
+            .Visible(false)
+            .DataType(GridColumnDataType.Number);
+        
+        columns.Add()
+            .DataField("CompanyName")
+            .Caption("Company Name")
+            .DataType(GridColumnDataType.String);
+        
+        columns.Add()
+            .DataField("IsActive")
+            .Caption("Active")
+            .DataType(GridColumnDataType.Boolean);
+        
+        columns.Add()
+            .DataField("CategoryID")
+            .Caption("Category")
+            .DataType(GridColumnDataType.Number)
+            .CalculateDisplayValue("calculateCategoryDisplayValue");
+    })
 )
+
+<script>
+    let categories = [];
+
+    // Load categories from server
+    $(function() {
+        $.get('/api/SampleData/categories', function(data) {
+            categories = data.map(c => ({ ID: c.ID, ParentID: c.ParentID, Name: c.Name }));
+        });
+    });
+
+
+    // Calculate display value for category
+    function calculateCategoryDisplayValue(row) {
+        console.log(row);
+        const category = categories.find(c => c.ID === row.CategoryID);
+        return category ? category.Name : '';
+    }
+
+    // Handle option changes
+    function onOptionChanged(e) {
+        if (e.fullName === 'columns[3].filterValue' && e.value === null) {
+            clearDropDownSelection();
+        }
+    }
+
+    // Clear DropDown selection
+    function clearDropDownSelection() {
+        const dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+        const treeList = $('#embeddedTreeList').dxTreeList('instance');
+
+        if (dropDownComponent) {
+            dropDownComponent.option('value', null);
+            dropDownComponent.close();
+        }
+
+        if (treeList) {
+            treeList.clearSelection();
+            treeList.option('expandedRowKeys', []);
+        }
+    }
+
+    // Custom editor preparing handler
+    function onEditorPreparing(e) {
+        // Customize boolean filter editor via e.editorName
+        if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
+            e.editorName = 'dxCheckBox';
+            e.editorOptions = {
+                value: e.value,
+                enableThreeStateBehavior: true,
+                onValueChanged: function(args) {
+                    e.setValue(args.value ?? null);
+                }
+            };
+        }
+
+        // Customize category filter editor via DOM injection to e.editorElement
+        if (e.parentType === 'filterRow' && e.dataField === 'CategoryID') {
+            e.cancel = true;
+            e.editorElement.append(createCustomEditor(e));
+        }
+    }
+
+    // Create custom editor for category filter
+    function createCustomEditor(dataGridArgs) {
+        return $('<div id="dropDownFilter">').dxDropDownBox({
+            value: dataGridArgs.value,
+            dataSource: categories,
+            valueExpr: 'ID',
+            displayExpr: 'Name',
+            buttons: [{
+                location: 'after',
+                name: 'customClear',
+                options: {
+                    icon: 'remove',
+                    onClick: function() {
+                        clearDropDownSelection();
+                        dataGridArgs.setValue(null);
+                    }
+                }
+            }],
+            contentTemplate: function(dropDownArgs) {
+                return $('<div id="embeddedTreeList">').dxTreeList({
+                    selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
+                    height: '100%',
+                    dataSource: categories,
+                    keyExpr: 'ID',
+                    parentIdExpr: 'ParentID',
+                    selection: { mode: 'single' },
+                    columns: ['Name'],
+                    onSelectionChanged: function(treeListArgs) {
+                        const selectedId = treeListArgs.currentSelectedRowKeys[0];
+                        if (!selectedId) return;
+                        dataGridArgs.setValue(selectedId);
+                        dropDownArgs.component.option('value', selectedId);
+                        dropDownArgs.component.close();
+                    }
+                });
+            }
+        });
+    }
+</script>
