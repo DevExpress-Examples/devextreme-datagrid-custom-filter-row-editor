@@ -13,14 +13,14 @@ namespace ASP_NET_Core.Controllers;
 [Route("api/[controller]")]
 public class SampleDataController: Controller {
 
-    [HttpGet]
-    public object Get(DataSourceLoadOptions loadOptions) {
-        return DataSourceLoader.Load(SampleData.Customers, loadOptions);
-    }
+  [HttpGet]
+  public object Get(DataSourceLoadOptions loadOptions) {
+    return DataSourceLoader.Load(SampleData.Customers, loadOptions);
+  }
 
-    [HttpGet("categories")]
-    public IActionResult GetCategories() {
-        return Ok(SampleData.Categories);
-    }
+  [HttpGet("categories")]
+  public IActionResult GetCategories() {
+    return Ok(SampleData.Categories);
+  }
 
 }
