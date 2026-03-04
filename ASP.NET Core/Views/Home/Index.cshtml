@@ -1,128 +1,128 @@
 <h2>DataGrid - Custom Filter Row Editor</h2>
 
 @(Html.DevExtreme().DataGrid()
-    .ID("gridContainer")
-    .OnInitialized("onInitialized")
-    .DataSource(d => d.Mvc()
-        .Controller("SampleData")
-        .LoadAction("Get")
-        .Key("ID")
-    )
-    .ShowBorders(true)
-    .FilterRow(f => f.Visible(true))
-    .OnOptionChanged("onOptionChanged")
-    .OnEditorPreparing("onEditorPreparing")
-    .Columns(columns => {
-        columns.Add()
-            .DataField("ID")
-            .Width(80)
-            .Visible(false)
-            .DataType(GridColumnDataType.Number);
-        
-        columns.Add()
-            .DataField("CompanyName")
-            .Caption("Company Name")
-            .DataType(GridColumnDataType.String);
-        
-        columns.Add()
-            .DataField("IsActive")
-            .Caption("Active")
-            .DataType(GridColumnDataType.Boolean)
-            .FilterValue(true);
-        
-        columns.Add()
-            .DataField("CategoryID")
-            .Caption("Category")
-            .DataType(GridColumnDataType.Number)
-            .CalculateDisplayValue(new JS("calculateDisplayCategory"))
-            .FilterValue(1);
-    })
+	.ID("gridContainer")
+	.OnInitialized("onInitialized")
+	.DataSource(d => d.Mvc()
+		.Controller("SampleData")
+		.LoadAction("Get")
+		.Key("ID")
+	)
+	.ShowBorders(true)
+	.FilterRow(f => f.Visible(true))
+	.OnOptionChanged("onOptionChanged")
+	.OnEditorPreparing("onEditorPreparing")
+	.Columns(columns => {
+		columns.Add()
+			.DataField("ID")
+			.Width(80)
+			.Visible(false)
+			.DataType(GridColumnDataType.Number);
+		
+		columns.Add()
+			.DataField("CompanyName")
+			.Caption("Company Name")
+			.DataType(GridColumnDataType.String);
+		
+		columns.Add()
+			.DataField("IsActive")
+			.Caption("Active")
+			.DataType(GridColumnDataType.Boolean)
+			.FilterValue(true);
+		
+		columns.Add()
+			.DataField("CategoryID")
+			.Caption("Category")
+			.DataType(GridColumnDataType.Number)
+			.CalculateDisplayValue(new JS("calculateDisplayCategory"))
+			.FilterValue(1);
+	})
 )
 
 <script>
   let categories = [];
 
   function onInitialized(e) {
-    $.get('/api/SampleData/categories', function(data) {
-      categories = data.map(c => ({ ID: c.ID, ParentID: c.ParentID, Name: c.Name }));
-    });
+	$.get('/api/SampleData/categories', function(obj) {
+        categories = obj.data;
+	});
   }
 
   function calculateDisplayCategory(rowData) {
-    return categories.find(c => c.ID === rowData.CategoryID)?.Name;
+	return categories.find(c => c.ID === rowData.CategoryID)?.Name;
   }
 
   function onOptionChanged(e) {
-    if (e.fullName === 'columns[3].filterValue' && e.value === null) {
-      clearDropDownSelection();
-    }
+	if (e.fullName === 'columns[3].filterValue' && e.value === null) {
+	  clearDropDownSelection();
+	}
   }
 
   function clearDropDownSelection() {
-    const dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
-    const treeList = $('#embeddedTreeList').dxTreeList('instance');
+	const dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+	const treeList = $('#embeddedTreeList').dxTreeList('instance');
 
-    dropDownComponent?.option('value', null);
-    dropDownComponent?.close();
+	dropDownComponent?.option('value', null);
+	dropDownComponent?.close();
 
-    treeList?.clearSelection();
-    treeList?.option('expandedRowKeys', []);
+	treeList?.clearSelection();
+	treeList?.option('expandedRowKeys', []);
   }
 
   function onEditorPreparing(e) {
-    // Customize boolean filter editor via e.editorName
-    if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
-      e.editorName = 'dxCheckBox';
-      e.editorOptions = {
-        value: e.value,
-        enableThreeStateBehavior: true,
-        onValueChanged: function(args) {
-          e.setValue(args.value ?? null);
-        }
-      };
-    }
-    // Customize category filter editor via DOM injection to e.editorElement
-    if (e.parentType === 'filterRow' && e.dataField === 'CategoryID') {
-      e.cancel = true;
-      e.editorElement.append(createCustomEditor(e));
-    }
+	// Customize boolean filter editor via e.editorName
+	if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
+	  e.editorName = 'dxCheckBox';
+	  e.editorOptions = {
+		value: e.value,
+		enableThreeStateBehavior: true,
+		onValueChanged: function(args) {
+		  e.setValue(args.value ?? null);
+		}
+	  };
+	}
+	// Customize category filter editor via DOM injection to e.editorElement
+	if (e.parentType === 'filterRow' && e.dataField === 'CategoryID') {
+	  e.cancel = true;
+	  e.editorElement.append(createCustomEditor(e));
+	}
   }
 
   function createCustomEditor(dataGridArgs) {
-    return $('<div id="dropDownFilter">').dxDropDownBox({
-      value: dataGridArgs.value,
-      dataSource: categories,
-      valueExpr: 'ID',
-      displayExpr: 'Name',
-      buttons: [{
-        location: 'after',
-        name: 'customClear',
-        options: {
-          icon: 'remove',
-          onClick: () => {
-            clearDropDownSelection();
-            dataGridArgs.setValue(null);
-          }
-        }
-      }],
-      contentTemplate: (dropDownArgs) => {
-        return $('<div id="embeddedTreeList">').dxTreeList({
-          selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
-          height: '100%',
-          dataSource: categories,
-          keyExpr: 'ID',
-          parentIdExpr: 'ParentID',
-          selection: { mode: 'single' },
-          columns: ['Name'],
-          onSelectionChanged: (treeListArgs) => {
-            const selectedId = treeListArgs.currentSelectedRowKeys[0];
-            if (!selectedId) return;
-            dataGridArgs.setValue(selectedId);
-            dropDownArgs.component.option('value', selectedId);
-            dropDownArgs.component.close();
-          }
-        });
-      }
-    });
+	return $('<div id="dropDownFilter">').dxDropDownBox({
+	  value: dataGridArgs.value,
+	  dataSource: categories,
+	  valueExpr: 'ID',
+	  displayExpr: 'Name',
+	  buttons: [{
+		location: 'after',
+		name: 'customClear',
+		options: {
+		  icon: 'remove',
+		  onClick: () => {
+			clearDropDownSelection();
+			dataGridArgs.setValue(null);
+		  }
+		}
+	  }],
+	  contentTemplate: (dropDownArgs) => {
+		return $('<div id="embeddedTreeList">').dxTreeList({
+		  selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
+		  height: '100%',
+		  dataSource: categories,
+		  keyExpr: 'ID',
+		  parentIdExpr: 'ParentID',
+		  selection: { mode: 'single' },
+		  columns: ['Name'],
+		  onSelectionChanged: (treeListArgs) => {
+			const selectedId = treeListArgs.currentSelectedRowKeys[0];
+			if (!selectedId) return;
+			dataGridArgs.setValue(selectedId);
+			dropDownArgs.component.option('value', selectedId);
+			dropDownArgs.component.close();
+		  }
+		});
+	  }
+	});
   }
 </script>

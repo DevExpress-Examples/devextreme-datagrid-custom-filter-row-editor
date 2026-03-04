@@ -19,8 +19,14 @@ public class SampleDataController: Controller {
   }
 
   [HttpGet("categories")]
-  public IActionResult GetCategories() {
-    return Ok(SampleData.Categories);
+  public object GetCategories(DataSourceLoadOptions loadOptions) {
+        var categories = SampleData.Categories
+            .Select(c => new Category {
+                ID = c.ID,
+                ParentID = c.ParentID,
+                Name = c.Name,
+            });
+    return DataSourceLoader.Load(categories, loadOptions);
   }
 
 }
