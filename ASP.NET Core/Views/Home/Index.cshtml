@@ -2,9 +2,8 @@
 
 @(Html.DevExtreme().DataGrid()
 	.ID("gridContainer")
-	.OnInitialized("onInitialized")
 	.DataSource(d => d.Mvc()
-		.Controller("SampleData")
+		.Controller("Customers")
 		.LoadAction("Get")
 		.Key("ID")
 	)
@@ -34,24 +33,19 @@
 			.DataField("CategoryID")
 			.Caption("Category")
 			.DataType(GridColumnDataType.Number)
-			.CalculateDisplayValue(new JS("calculateDisplayCategory"))
+            .Lookup(lookup => lookup 
+                .DataSource(d => d.Mvc().Controller("Categories").LoadAction("Get").Key("ID"))
+                .DisplayExpr("Name")
+                .ValueExpr("ID")
+            )
+            .FilterOperations(new[] {
+                GridFilterOperations.Equal,
+            })
 			.FilterValue(1);
 	})
 )
 
 <script>
-  let categories = [];
-
-  function onInitialized(e) {
-	$.get('/api/SampleData/categories', function(obj) {
-        categories = obj.data;
-	});
-  }
-
-  function calculateDisplayCategory(rowData) {
-	return categories.find(c => c.ID === rowData.CategoryID)?.Name;
-  }
-
   function onOptionChanged(e) {
 	if (e.fullName === 'columns[3].filterValue' && e.value === null) {
 	  clearDropDownSelection();
@@ -91,7 +85,12 @@
   function createCustomEditor(dataGridArgs) {
 	return $('<div id="dropDownFilter">').dxDropDownBox({
 	  value: dataGridArgs.value,
-	  dataSource: categories,
+      dataSource: {
+        store: DevExpress.data.AspNet.createStore({
+            key: "ID",
+            loadUrl: "api/Categories/Get"
+        })
+      },
 	  valueExpr: 'ID',
 	  displayExpr: 'Name',
 	  buttons: [{
@@ -109,7 +108,7 @@
 		return $('<div id="embeddedTreeList">').dxTreeList({
 		  selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
 		  height: '100%',
-		  dataSource: categories,
+          dataSource: dropDownArgs.component.getDataSource(),
 		  keyExpr: 'ID',
 		  parentIdExpr: 'ParentID',
 		  selection: { mode: 'single' },
