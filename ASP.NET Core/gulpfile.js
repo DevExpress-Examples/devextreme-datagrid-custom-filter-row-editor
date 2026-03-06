@@ -64,7 +64,7 @@ scripts = [...defaultScripts, ...quillScripts, dxtScripts];
 scripts = [...exportScripts, ...scripts];
 */
 
- /* // Full bundle 
+/* // Full bundle 
 
 scripts = [...exportScripts, ...defaultScripts, ...ganttScript, ...diagramScript, ...quillScripts, ...dxtScripts];
 styles = [...dxtStyles, ...diagramStyles, ...ganttStyles];

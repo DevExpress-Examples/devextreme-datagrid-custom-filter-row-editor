@@ -20,7 +20,11 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="DevExtreme.AspNet.Core" Version="25.1.*" />
+    <PackageReference Include="DevExtreme.AspNet.Core" Version="25.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>
