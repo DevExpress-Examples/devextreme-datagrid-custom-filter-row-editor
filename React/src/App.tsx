@@ -45,6 +45,8 @@ function App(): JSX.Element {
     [],
   );
 
+  const filterOperations = ["="];
+
   return (
     <div className="demo-container">
       <DataGrid
@@ -65,6 +67,7 @@ function App(): JSX.Element {
           caption="Category"
           calculateDisplayValue={calculateDisplayValue}
           filterValue={1}
+          filterOperations={filterOperations}
         />
       </DataGrid>
     </div>
