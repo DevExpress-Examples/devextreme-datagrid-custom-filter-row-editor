@@ -45,6 +45,7 @@ $(() => {
         dataField: 'IsActive',
         dataType: 'boolean',
         caption: 'Active',
+        filterValue: true
       },
       {
         dataField: 'CategoryId',
@@ -53,6 +54,7 @@ $(() => {
         calculateDisplayValue: (row) => {
           return categories.find(c => c.id === row.CategoryId)?.name;
         },
+        filterValue: 1
       },
     ],
   });
