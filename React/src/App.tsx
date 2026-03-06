@@ -12,6 +12,8 @@ import { customers, categories, type Customer } from './data';
 import CustomEditor from './components/CustomEditor.tsx';
 import type { CustomEditorHandle } from './types/CustomEditor.types';
 
+const filterOperations = ['='];
+
 function App(): JSX.Element {
   const dataGrid = useRef<DataGridRef | null>(null);
   const customEditorRef = useRef<CustomEditorHandle | null>(null);
@@ -44,8 +46,6 @@ function App(): JSX.Element {
     (row: Customer) => categories.find((c) => c.id === row.CategoryId)?.name ?? '',
     [],
   );
-
-  const filterOperations = ["="];
 
   return (
     <div className="demo-container">
