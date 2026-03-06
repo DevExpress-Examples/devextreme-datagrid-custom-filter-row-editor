@@ -12,7 +12,7 @@ import { customers, categories, type Customer } from '../data';
 
 let vnode: VNode | null = null;
 
-const filterOperations = ["="];
+const filterOperations = ['='];
 
 function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
   // Customize boolean filter editor via e.editorName
