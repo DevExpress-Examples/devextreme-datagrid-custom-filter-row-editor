@@ -1,29 +1,127 @@
-@using ASP_NET_Core.Models
+<h2>DataGrid - Custom Filter Row Editor</h2>
 
-<h2>Home</h2>
-
-@(Html.DevExtreme().DataGrid<SampleOrder>()
-    .ShowBorders(true)
-    .DataSource(d => d.Mvc().Controller("SampleData").LoadAction("Get").Key("OrderID"))
-    .Columns(columns => {
-        columns.AddFor(m => m.OrderID);
-        columns.AddFor(m => m.OrderDate);
-        columns.AddFor(m => m.CustomerName);
-        columns.AddFor(m => m.ShipCountry);
-        columns.AddFor(m => m.ShipCity);
-    })
-    .Paging(p => p.PageSize(10))
-    .FilterRow(f => f.Visible(true))
-    .HeaderFilter(f => f.Visible(true))
-    .GroupPanel(p => p.Visible(true))
-    .Grouping(g => g.AutoExpandAll(false))
-    .RemoteOperations(true)
-    .Summary(s => s
-        .TotalItems(totalItems => {
-            totalItems.AddFor(m => m.ShipCity).SummaryType(SummaryType.Count);
-        })
-        .GroupItems(groupItems => {
-            groupItems.Add().SummaryType(SummaryType.Count);
-        })
-    )
+@(Html.DevExtreme().DataGrid()
+	.ID("gridContainer")
+	.DataSource(d => d.Mvc()
+		.Controller("Customers")
+		.LoadAction("Get")
+		.Key("ID")
+	)
+	.ShowBorders(true)
+	.FilterRow(f => f.Visible(true))
+	.OnOptionChanged("onOptionChanged")
+	.OnEditorPreparing("onEditorPreparing")
+	.Columns(columns => {
+		columns.Add()
+			.DataField("ID")
+			.Width(80)
+			.Visible(false)
+			.DataType(GridColumnDataType.Number);
+		
+		columns.Add()
+			.DataField("CompanyName")
+			.Caption("Company Name")
+			.DataType(GridColumnDataType.String);
+		
+		columns.Add()
+			.DataField("IsActive")
+			.Caption("Active")
+			.DataType(GridColumnDataType.Boolean)
+			.FilterValue(true);
+		
+		columns.Add()
+			.DataField("CategoryID")
+			.Caption("Category")
+			.DataType(GridColumnDataType.Number)
+            .Lookup(lookup => lookup 
+                .DataSource(d => d.Mvc().Controller("Categories").LoadAction("Get").Key("ID"))
+                .DisplayExpr("Name")
+                .ValueExpr("ID")
+            )
+            .FilterOperations(new[] {
+                GridFilterOperations.Equal,
+            })
+			.FilterValue(1);
+	})
 )
+
+<script>
+  function onOptionChanged(e) {
+	if (e.fullName === 'columns[3].filterValue' && e.value === null) {
+	  clearDropDownSelection();
+	}
+  }
+
+  function clearDropDownSelection() {
+	const dropDownComponent = $('#dropDownFilter').dxDropDownBox('instance');
+	const treeList = $('#embeddedTreeList').dxTreeList('instance');
+
+	dropDownComponent?.option('value', null);
+	dropDownComponent?.close();
+
+	treeList?.clearSelection();
+	treeList?.option('expandedRowKeys', []);
+  }
+
+  function onEditorPreparing(e) {
+	// Customize boolean filter editor via e.editorName
+	if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
+	  e.editorName = 'dxCheckBox';
+	  e.editorOptions = {
+		value: e.value,
+		enableThreeStateBehavior: true,
+		onValueChanged: function(args) {
+		  e.setValue(args.value ?? null);
+		}
+	  };
+	}
+	// Customize category filter editor via DOM injection to e.editorElement
+	if (e.parentType === 'filterRow' && e.dataField === 'CategoryID') {
+	  e.cancel = true;
+	  e.editorElement.append(createCustomEditor(e));
+	}
+  }
+
+  function createCustomEditor(dataGridArgs) {
+	return $('<div id="dropDownFilter">').dxDropDownBox({
+	  value: dataGridArgs.value,
+      dataSource: {
+        store: DevExpress.data.AspNet.createStore({
+            key: "ID",
+            loadUrl: "api/Categories/Get"
+        })
+      },
+	  valueExpr: 'ID',
+	  displayExpr: 'Name',
+	  buttons: [{
+		location: 'after',
+		name: 'customClear',
+		options: {
+		  icon: 'remove',
+		  onClick: () => {
+			clearDropDownSelection();
+			dataGridArgs.setValue(null);
+		  }
+		}
+	  }],
+	  contentTemplate: (dropDownArgs) => {
+		return $('<div id="embeddedTreeList">').dxTreeList({
+		  selectedRowKeys: dropDownArgs.value != null ? [dropDownArgs.value] : [],
+		  height: '100%',
+          dataSource: dropDownArgs.component.getDataSource(),
+		  keyExpr: 'ID',
+		  parentIdExpr: 'ParentID',
+		  selection: { mode: 'single' },
+		  columns: ['Name'],
+		  onSelectionChanged: (treeListArgs) => {
+			const selectedId = treeListArgs.currentSelectedRowKeys[0];
+			if (!selectedId) return;
+			dataGridArgs.setValue(selectedId);
+			dropDownArgs.component.option('value', selectedId);
+			dropDownArgs.component.close();
+		  }
+		});
+	  }
+	});
+  }
+</script>
