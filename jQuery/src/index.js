@@ -54,6 +54,7 @@ $(() => {
         calculateDisplayValue: (row) => {
           return categories.find(c => c.id === row.CategoryId)?.name;
         },
+        filterOperations: ["="],
         filterValue: 1
       },
     ],
