@@ -12,6 +12,8 @@ import { customers, categories, type Customer } from '../data';
 
 let vnode: VNode | null = null;
 
+const filterOperations = ["="];
+
 function onEditorPreparing(e: DxDataGridTypes.EditorPreparingEvent): void {
   // Customize boolean filter editor via e.editorName
   if (e.parentType === 'filterRow' && e.dataField === 'IsActive') {
@@ -92,6 +94,7 @@ function calculateDisplayValue(row: Customer): string {
         caption="Category"
         :calculate-display-value="calculateDisplayValue"
         :filter-value="1"
+        :filter-operations="filterOperations"
       />
     </DxDataGrid>
   </div>
