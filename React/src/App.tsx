@@ -12,6 +12,8 @@ import { customers, categories, type Customer } from './data';
 import CustomEditor from './components/CustomEditor.tsx';
 import type { CustomEditorHandle } from './types/CustomEditor.types';
 
+const filterOperations = ['='];
+
 function App(): JSX.Element {
   const dataGrid = useRef<DataGridRef | null>(null);
   const customEditorRef = useRef<CustomEditorHandle | null>(null);
@@ -65,6 +67,7 @@ function App(): JSX.Element {
           caption="Category"
           calculateDisplayValue={calculateDisplayValue}
           filterValue={1}
+          filterOperations={filterOperations}
         />
       </DataGrid>
     </div>
