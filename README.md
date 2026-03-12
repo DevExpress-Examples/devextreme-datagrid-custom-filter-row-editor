@@ -23,7 +23,18 @@ This example implements both approaches.
 
 ### Change the DevExtreme Component
 
-Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*). This example implements this approach for the `IsActive` column.
+Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*).
+
+```JavaScript
+onEditorPreparing: (e) => {
+    if (e.parentType === 'filterRow') {
+        e.editorName = 'dxCheckBox';
+        // ...
+    }
+}
+```
+
+This example implements this approach for the `IsActive` column.
 
 ### Render Custom Markup
 
@@ -33,6 +44,15 @@ To render custom markup in editor containers:
 - Render your markup within **EditorPreparingEvent**.**editorElement** as follows:
     - **jQuery** and **ASP.NET Core**: Call the [append()](https://api.jquery.com/append/) method.
     - **React**, **Angular**, and **Vue**: Use the framework's DOM injection mechanisms.
+
+```JavaScript
+onEditorPreparing: (e) => {
+    if (e.parentType === 'filterRow') {
+        e.cancel = true;
+	    // Render custom markup here
+    }
+}
+```
 
 This example implements this approach for the `CategoryID` column.
 
