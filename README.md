@@ -16,12 +16,11 @@ To customize DataGrid editors, implement an [onEditorPreparing](https://js.devex
 
 You can customize DataGrid editors in two ways:
 
-- Change the DevExtreme component used as the editor.
-- Render custom markup in editor containers.
+- Replace built-in editors with other DevExtreme components.
+- Use custom markup in editor containers.
 
-This example implements both approaches.
 
-### Change the DevExtreme Component
+### Replace the DevExtreme Component
 
 Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*).
 
@@ -36,7 +35,7 @@ onEditorPreparing: (e) => {
 
 This example implements this approach for the `IsActive` column.
 
-### Render Custom Markup
+### Use Custom Markup
 
 To render custom markup in editor containers:
 
