@@ -12,7 +12,7 @@ This example configures custom filter row editors within the DevExtreme [DataGri
 
 ## Implementation Details
 
-To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To apply changes only to the filter row, check that **EditorPreparingEvent**.**parentType** is *"filterRow"*.
+To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To apply changes only to the filter row, ensure **EditorPreparingEvent**.**parentType** is *"filterRow"*.
 
 You can customize DataGrid editors in two ways:
 
