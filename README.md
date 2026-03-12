@@ -6,21 +6,26 @@
 <!-- default badges end -->
 # DataGrid for DevExtreme - Customize Filter Row Editors
 
-This example configures DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/) to display custom filter row editors.
+This example configures custom filter row editors within the DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/).
 
 ![DataGrid for DevExtreme - Customize Filter Row Editors](./images/custom-filter-row-editor.gif)
 
 ## Implementation Details
 
-To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To customize the filter row, check that **EditorPreparingEvent**.**parentType** is *"filterRow"*.
+To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To apply changes only to the filter row, check that **EditorPreparingEvent**.**parentType** is *"filterRow"*.
 
-To customize editors, you change the DevExtreme component used as the editor, or render custom markup in editor containers. This example implements both approaches.
+You can customize DataGrid editors in two ways:
 
-### Change the DevExtreme component
+- Change the DevExtreme component used as the editor.
+- Render custom markup in editor containers.
+
+This example implements both approaches.
+
+### Change the DevExtreme Component
 
 Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*). This example implements this approach for the `IsActive` column.
 
-### Render custom markup
+### Render Custom Markup
 
 To render custom markup in editor containers:
 
