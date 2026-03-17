@@ -6,23 +6,22 @@
 <!-- default badges end -->
 # DataGrid for DevExtreme - Customize Filter Row Editors
 
-This example configures custom filter row editors within the DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/).
+This example configures the custom filter row editors used within the DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/).
 
 ![DataGrid for DevExtreme - Customize Filter Row Editors](./images/custom-filter-row-editor.gif)
 
 ## Implementation Details
 
-To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To apply changes only to the filter row, ensure **EditorPreparingEvent**.**parentType** is *"filterRow"*.
+To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To only apply changes to the filter row, ensure **EditorPreparingEvent**.**parentType** is *"filterRow"*.
 
 You can customize DataGrid editors in two ways:
 
 - Replace built-in editors with other DevExtreme components.
 - Use custom markup in editor containers.
 
-
 ### Replace the DevExtreme Component
 
-Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*).
+Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component using *"dxComponentName"* format (for instance, *"dxCheckBox"*).
 
 ```JavaScript
 onEditorPreparing: (e) => {
@@ -33,7 +32,7 @@ onEditorPreparing: (e) => {
 }
 ```
 
-This example implements this approach for the `IsActive` column.
+This example uses this approach for the `IsActive` column.
 
 ### Use Custom Markup
 
@@ -53,7 +52,7 @@ onEditorPreparing: (e) => {
 }
 ```
 
-This example implements this approach for the `CategoryID` column.
+This example uses this approach for the `CategoryID` column.
 
 ## Files to Review
 
