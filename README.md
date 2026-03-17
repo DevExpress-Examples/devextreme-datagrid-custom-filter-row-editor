@@ -6,21 +6,35 @@
 <!-- default badges end -->
 # DataGrid for DevExtreme - Customize Filter Row Editors
 
-This example configures DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/) to display custom filter row editors.
+This example configures the custom filter row editors used within the DevExtreme [DataGrid](https://js.devexpress.com/Documentation/Guide/UI_Components/DataGrid/Overview/).
 
 ![DataGrid for DevExtreme - Customize Filter Row Editors](./images/custom-filter-row-editor.gif)
 
 ## Implementation Details
 
-To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To customize the filter row, check that **EditorPreparingEvent**.**parentType** is *"filterRow"*.
+To customize DataGrid editors, implement an [onEditorPreparing](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/#onEditorPreparing) handler. To only apply changes to the filter row, ensure **EditorPreparingEvent**.**parentType** is *"filterRow"*.
 
-To customize editors, you change the DevExtreme component used as the editor, or render custom markup in editor containers. This example implements both approaches.
+You can customize DataGrid editors in two ways:
 
-### Change the DevExtreme component
+- Replace built-in editors with other DevExtreme components.
+- Use custom markup in editor containers.
 
-Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component in the *"dxComponentName"* format (for instance, *"dxCheckBox"*). This example implements this approach for the `IsActive` column.
+### Replace the DevExtreme Component
 
-### Render custom markup
+Override **EditorPreparingEvent**.**editorName** to replace the default editor. Specify a DevExtreme component using *"dxComponentName"* format (for instance, *"dxCheckBox"*).
+
+```JavaScript
+onEditorPreparing: (e) => {
+    if (e.parentType === 'filterRow') {
+        e.editorName = 'dxCheckBox';
+        // ...
+    }
+}
+```
+
+This example uses this approach for the `IsActive` column.
+
+### Use Custom Markup
 
 To render custom markup in editor containers:
 
@@ -29,7 +43,16 @@ To render custom markup in editor containers:
     - **jQuery** and **ASP.NET Core**: Call the [append()](https://api.jquery.com/append/) method.
     - **React**, **Angular**, and **Vue**: Use the framework's DOM injection mechanisms.
 
-This example implements this approach for the `CategoryID` column.
+```JavaScript
+onEditorPreparing: (e) => {
+    if (e.parentType === 'filterRow') {
+        e.cancel = true;
+	    // Render custom markup here
+    }
+}
+```
+
+This example uses this approach for the `CategoryID` column.
 
 ## Files to Review
 
