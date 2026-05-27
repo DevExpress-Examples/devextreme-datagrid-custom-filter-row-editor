@@ -4,17 +4,18 @@ import { Component, ViewContainerRef,
 import type { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { DxButtonTypes } from 'devextreme-angular/ui/button';
 import { DxTreeViewComponent } from 'devextreme-angular/';
-import { DxDropDownBoxTypes } from 'devextreme-angular/ui/drop-down-box';
-import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
+import {DxDropDownBoxTypes, DxDropDownBoxModule} from 'devextreme-angular/ui/drop-down-box';
+import {DxTreeListTypes, DxTreeListModule} from 'devextreme-angular/ui/tree-list';
 import { DxCheckBoxTypes } from 'devextreme-angular/ui/check-box';
 import { Customer, Category, DataService } from './services/data.service';
 import { one } from "devextreme/events";
+import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 
 @Component({
   selector: 'app-root',
+  imports: [DxDataGridModule, DxDropDownBoxModule, DxTreeListModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: false,
 })
 export class AppComponent {
   @ViewChild("treeViewComponent", { static: false }) treeViewComponent!: DxTreeViewComponent;
