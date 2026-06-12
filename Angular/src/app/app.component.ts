@@ -1,6 +1,9 @@
-import { Component, ViewContainerRef,
+import {
+  Component, ViewContainerRef,
   TemplateRef,
-  ViewChild} from '@angular/core';
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import type { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { DxButtonTypes } from 'devextreme-angular/ui/button';
 import { DxTreeViewComponent } from 'devextreme-angular/';
@@ -15,6 +18,7 @@ import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
   selector: 'app-root',
   imports: [DxDataGridModule, DxDropDownBoxModule, DxTreeListModule],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
